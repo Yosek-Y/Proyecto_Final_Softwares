@@ -1,5 +1,9 @@
+using Microsoft.EntityFrameworkCore;
+using Mecario_BackEnd.DBContexs;
 var builder = WebApplication.CreateBuilder(args);
-
+// Configurar Entity Framework Core con SQL Server
+builder.Services.AddDbContext<ContextoBD>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -17,6 +21,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+// Aplicar la política de CORS
+app.UseCors("AllowAll");
 
 app.UseAuthorization();
 

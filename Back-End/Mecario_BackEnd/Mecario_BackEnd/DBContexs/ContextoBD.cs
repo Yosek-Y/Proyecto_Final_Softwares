@@ -5,7 +5,11 @@ namespace Mecario_BackEnd.DBContexs
 {
     public class ContextoBD : DbContext
     {
-        public ContextoBD (DbContextOptions <ContextoBD> options) : base (options) { }
+        public ContextoBD (DbContextOptions <ContextoBD> options) 
+            : base (options) 
+        {
+        
+        }
 
         public DbSet <Usuarios> Usuarios { get; set; }
 
@@ -123,11 +127,12 @@ namespace Mecario_BackEnd.DBContexs
                 entity.Property(e => e.idCaso).ValueGeneratedOnAdd();
 
                 //FechaInicio OBLIGATORIO (NOT NULL), FechaFin OPCIONAL (NULL)
-                entity.Property(e => e.fechaInicio).IsRequired();               //Fecha cuando el mecanico INICIA la reparacion o el mantenimiento
-                entity.Property(e => e.fechaFin).IsRequired(false);             //Fecha cuando el mecanico TERMINA la reparacion o el mantenimiento
+                entity.Property(e => e.fechaInicio).IsRequired();                           //Fecha cuando el mecanico INICIA la reparacion o el mantenimiento
+                entity.Property(e => e.fechaFin).IsRequired(false);                         //Fecha cuando el mecanico TERMINA la reparacion o el mantenimiento
                 //CAMPOS OBLIGATORIOS (NOT NULL)
-                entity.Property(e => e.horasTrabajadas).IsRequired();           //Horas totales en las que el mecanico trabajo en el caso
-                entity.Property(e => e.totalCaso).IsRequired();                 //Precio total del caso
+                entity.Property(e => e.horasTrabajadas).IsRequired();                       //Horas totales en las que el mecanico trabajo en el caso
+                entity.Property(e => e.estadoCaso).IsRequired().HasConversion<string>();    //Estado del caso en el momento (No iniciado, En terminado, Terminado)
+                entity.Property(e => e.totalCaso).IsRequired();                             //Precio total del caso
 
                 //FK CON DETALLES CASO
                 entity.HasMany(e => e.detallesCaso)

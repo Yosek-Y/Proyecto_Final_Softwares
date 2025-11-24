@@ -6,6 +6,8 @@
         public DateTime fechaInicio { get; set; }
         public DateTime? fechaFin { get; set; }
         public double horasTrabajadas { get; set; }
+        public enum EstadoCaso { noEmpezado = 1, enProceso = 2, terminado = 3 }
+        public EstadoCaso estadoCaso { get; set; }
 
         //Este total será calculado con el Subtotal de OrdenServicio + Suma de DetallesPieza + costoHorasMecanico
         public double totalCaso { get; set; }
