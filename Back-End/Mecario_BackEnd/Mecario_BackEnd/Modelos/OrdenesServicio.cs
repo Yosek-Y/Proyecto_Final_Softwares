@@ -5,7 +5,8 @@ namespace Mecario_BackEnd.Modelos
     public class OrdenesServicio
     {
         public int idOrden { get; set; }
-        public string tipoServicio { get; set; } 
+        public enum TipoServicio { Mantenimiento = 1, Reparacion = 2 }
+        public TipoServicio tipoServicio { get; set; } 
         public string diagnosticoInicial { get; set; }
         public double costoInicial { get; set; }
 
@@ -15,6 +16,6 @@ namespace Mecario_BackEnd.Modelos
 
         //RELACIONES DE LA ENTIDAD ORDENES SERVICIOS
         //Relación 1:N --> Una Orden de servicio produce un Caso
-        public ICollection<Casos> caso { get; set; }
+        public ICollection<Casos> casos { get; set; }
     }
 }

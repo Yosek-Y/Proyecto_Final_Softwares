@@ -20,7 +20,7 @@
 
         //RELACIONES
         //1:N --> Un caso tiene muchos detalles
-        public ICollection<DeatallesCaso> detallesCaso { get; set; }
+        public ICollection<DetallesCaso> detallesCaso { get; set; }
 
         //N:N --> Un caso usa muchas piezas
         public ICollection<DetallesPiezas> detallesPieza { get; set; }

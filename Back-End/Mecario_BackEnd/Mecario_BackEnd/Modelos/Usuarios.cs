@@ -7,7 +7,8 @@
         public string telefonoUsuario { get; set; }
         public string correoUsuario { get; set; }
         public string direccionUsuario { get; set; }
-        public string tipoUsuario { get; set; } // "Mecanico" o "Admin"
+        public enum Tipousuario { Mecanico = 1, Admin = 2 }
+        public Tipousuario tipoUsuario { get; set; } // "Mecanico" o "Admin"
         public string userName { get; set; }
         public string userPassword { get; set; }
 

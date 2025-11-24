@@ -20,6 +20,5 @@ namespace Mecario_BackEnd.Modelos
         //Relación 1:N --> Un Vehiculo genera muchas Ordenes de servicio
         public ICollection<OrdenesServicio> ordenesServicios { get; set; }
 
-
     }
 }

@@ -9,8 +9,6 @@
 
         public int idPieza { get; set; }
         public Piezas piezas { get; set; }
-
-        public DateTime hora { get; set; }
         public int cantidad { get; set; }
 
         public double precioUnitario { get; set; }

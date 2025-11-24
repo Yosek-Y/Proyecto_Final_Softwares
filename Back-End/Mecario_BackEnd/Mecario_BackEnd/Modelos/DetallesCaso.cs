@@ -1,6 +1,6 @@
 ﻿namespace Mecario_BackEnd.Modelos
 {
-    public class DeatallesCaso
+    public class DetallesCaso
     {
         public int idDetalleCaso { get; set; }
         public DateTime hora { get; set; }
