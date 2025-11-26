@@ -43,6 +43,7 @@ namespace Mecario_BackEnd.DBContexs
                 entity.Property(e => e.nombreCliente).IsRequired();      //Nombre completo del cliente
                 entity.Property(e => e.telefonoCliente).IsRequired();    //Telefono del cliente
                 entity.Property(e => e.correoCliente).IsRequired();      //Correo del cliente
+                entity.HasIndex(e => e.correoCliente).IsUnique();        //correo unico
                 entity.Property(e => e.direccionCliente).IsRequired();   //Dirección del cliente
                 //FK A VEHICULOS
                 entity.HasMany(e => e.Vehiculos)
@@ -60,12 +61,13 @@ namespace Mecario_BackEnd.DBContexs
                 entity.HasKey(e => e.idVehiculo);
                 entity.Property(e => e.idVehiculo).ValueGeneratedOnAdd();
                 //CAMPOS OBLIGATORIOS (NOT NULL)
-                entity.Property(e => e.placa).IsRequired();                   //Placa del vehiculo (AABB34)
-                entity.Property(e => e.marca).IsRequired();                   //Marca del vehiculo (Nissan, Toyota, etc..)
-                entity.Property(e => e.modelo).IsRequired();                  //Modelo del vehiculo (Frontier, Hilux, etc..)
-                entity.Property(e => e.anio).IsRequired();                    //Año del vehiculo 
-                entity.Property(e => e.color).IsRequired();                   //Color del vehiculo
-                entity.Property(e => e.numeroChasis).IsRequired();            //Numero del chasis (AAAAAABBBBB121313)
+                entity.Property(e => e.placa).IsRequired().HasMaxLength(6);                    //Placa del vehiculo (AABB34)
+                entity.Property(e => e.marca).IsRequired();                                    //Marca del vehiculo (Nissan, Toyota, etc..)
+                entity.Property(e => e.modelo).IsRequired();                                   //Modelo del vehiculo (Frontier, Hilux, etc..)
+                entity.Property(e => e.anio).IsRequired();                                     //Año del vehiculo 
+                entity.Property(e => e.color).IsRequired();                                    //Color del vehiculo
+                entity.Property(e => e.numeroChasis).IsRequired().HasMaxLength(16);            //Numero del chasis (AAAAAABBBBB121313)
+                entity.HasIndex(e => e.numeroChasis).IsUnique();                               //El numero de chasis debe ser unico
                 //FK A ORDENES DE SERVICIOS
                 entity.HasMany(e => e.ordenesServicios)
                       .WithOne(o => o.vehiculos)
@@ -105,9 +107,11 @@ namespace Mecario_BackEnd.DBContexs
                 entity.Property(e => e.nombreUsuario).IsRequired();                             //Nombre completo del usuario
                 entity.Property(e => e.telefonoUsuario).IsRequired();                           //Numero de telefo del usuario
                 entity.Property(e => e.correoUsuario).IsRequired();                             //Correo del usuario
+                entity.HasIndex(e => e.correoUsuario).IsUnique();                               //Correo unico
                 entity.Property(e => e.direccionUsuario).IsRequired();                          //Direccion del usuario
                 entity.Property(e => e.tipoUsuario).IsRequired().HasConversion<string>();       //Tipo de usuario o Admin o Mecanico
                 entity.Property(e => e.userName).IsRequired();                                  //Nombre del usuario para el app
+                entity.HasIndex(e => e.userName).IsUnique();                                    //Que sea unico ese username
                 entity.Property(e => e.userPassword).IsRequired();                              //contraseña del user para el app
 
                 //FK A CASOS

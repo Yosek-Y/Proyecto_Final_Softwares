@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Mecario_BackEnd.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("Api/[controller]")]
     public class PiezasController : ControllerBase
     {
         private readonly PiezasServicio _service;
@@ -15,9 +15,8 @@ namespace Mecario_BackEnd.Controllers
             _service = service;
         }
 
-        // ============================
-        // POST: api/Piezas/AgregarPieza
-        // ============================
+        //Protocolo HTTP Post para agregar nueva pieza al inventario
+        //POST: api/Piezas/AgregarPieza
         [HttpPost("AgregarPieza")]
         public async Task<IActionResult> AgregarPieza([FromBody] AgregarPiezaNuevaDTO dto)
         { //Llama al meetodo de Agregar nueva pieza
@@ -39,5 +38,54 @@ namespace Mecario_BackEnd.Controllers
                 return StatusCode(500, new { error = "Error interno del servidor", detalle = ex.Message });
             }
         }
+
+        //Protocolo HTTP Put para añadir stock a una pieza existente
+        //PUT: api/Piezas/AgregarStock
+        [HttpPut("AgregarStock")]
+        public async Task<IActionResult> AgregarStock([FromBody] AgregarReducirStockDTO dto)
+        {
+            try
+            {
+                var piezaActualizada = await _service.AgregarStock(dto);
+                return Ok(new
+                {
+                    mensaje = "Stock actualizado correctamente",
+                    data = piezaActualizada
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Error interno del servidor", detalle = ex.Message });
+            }
+        }
+
+        //Protocolo HTTP Put para reducir stock a una pieza existente
+        //PUT: api/Piezas/AgregarStock
+        [HttpPut("ReducirStock")]
+        public async Task<IActionResult> ReducirStock([FromBody] AgregarReducirStockDTO dto)
+        {
+            try
+            {
+                var piezaActualizada = await _service.ReducirStock(dto);
+                return Ok(new
+                {
+                    mensaje = "Stock actualizado correctamente",
+                    data = piezaActualizada
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Error interno del servidor", detalle = ex.Message });
+            }
+        }
+
     }
 }

@@ -55,11 +55,68 @@ namespace Mecario_BackEnd.Servicios
                 stockActual = dto.stockActual
             };
 
-            //  GUARDAR EN BASE DE DATOS
+            //GUARDAR EN BASE DE DATOS
             _context.Piezas.Add(nuevaPieza);
             await _context.SaveChangesAsync();
 
             return nuevaPieza;
         }
+
+        //Metodo para agregar stock a una pieza existente
+        public async Task<Piezas> AgregarStock(AgregarReducirStockDTO dto)
+        {
+            //VALIDACIONES
+            if (dto == null)
+                throw new ArgumentException("Los datos enviados están vacíos.");
+
+            if (string.IsNullOrWhiteSpace(dto.codigoPieza))
+                throw new ArgumentException("El código de la pieza es obligatorio.");
+
+            if (dto.cantidad <= 0)
+                throw new ArgumentException("La cantidad a sumar debe ser mayor a 0.");
+
+            //Busca la pieza por código
+            var pieza = await _context.Piezas.FirstOrDefaultAsync(p => p.codigoPieza == dto.codigoPieza);
+
+            if (pieza == null)
+                throw new ArgumentException("No existe una pieza con ese código.");
+
+            //Sumar al stock
+            pieza.stockActual += dto.cantidad;
+
+            //Guardar cambios
+            await _context.SaveChangesAsync();
+
+            return pieza;
+        }
+
+        //Metodo para reducir el stock a una pieza existente (Si basicamente lo reutilizamos)
+        public async Task<Piezas> ReducirStock(AgregarReducirStockDTO dto)
+        {
+            //VALIDACIONES
+            if (dto == null)
+                throw new ArgumentException("Los datos enviados están vacíos.");
+
+            if (string.IsNullOrWhiteSpace(dto.codigoPieza))
+                throw new ArgumentException("El código de la pieza es obligatorio.");
+
+            if (dto.cantidad <= 0)
+                throw new ArgumentException("La cantidad a sumar debe ser mayor a 0.");
+
+            //Busca la pieza por código
+            var pieza = await _context.Piezas.FirstOrDefaultAsync(p => p.codigoPieza == dto.codigoPieza);
+
+            if (pieza == null)
+                throw new ArgumentException("No existe una pieza con ese código.");
+
+            //Restar al stock
+            pieza.stockActual -= dto.cantidad;
+
+            //Guardar cambios
+            await _context.SaveChangesAsync();
+
+            return pieza;
+        }
+
     }
 }

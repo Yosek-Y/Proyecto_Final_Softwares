@@ -7,6 +7,8 @@ builder.Services.AddDbContext<ContextoBD>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 // Add services to the container.
 builder.Services.AddScoped<PiezasServicio>();
+builder.Services.AddScoped<UsuariosServicio>();
+builder.Services.AddScoped<CasosServicio>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
