@@ -187,5 +187,51 @@ namespace Mecario_BackEnd.Servicios
             return lista;
         }
 
+        // Método para que el admin asigne un caso a un mecánico
+        public async Task<string> AsignarCasoPorAdmin(AsignarCasoAdminDTO dto)
+        {
+            if (dto == null)
+                throw new ArgumentException("Los datos enviados están vacíos.");
+
+            // Busca el caso
+            var caso = await _context.Casos.FirstOrDefaultAsync(c => c.idCaso == dto.idCaso);
+            if (caso == null)
+                throw new ArgumentException("El caso indicado no existe.");
+
+            // Busca el usuario
+            var mecanico = await _context.Usuarios.FirstOrDefaultAsync(u => u.idUsuario == dto.idMecanico);
+            if (mecanico == null)
+                throw new ArgumentException("El mecánico no existe.");
+
+            if (mecanico.tipoUsuario != Usuarios.Tipousuario.Mecanico)
+                throw new ArgumentException("El usuario seleccionado no es un mecánico.");
+
+            // Asigna
+            caso.idUsuario = dto.idMecanico;
+
+            await _context.SaveChangesAsync();
+
+            return "Caso asignado correctamente al mecánico.";
+        }
+
+        // Método para asignar un mecánico a un caso
+        public async Task<Casos> AsignarMecanico(MecanicoSeAsignaCasoDTO dto)
+        {
+            // Valida que exista el caso
+            var caso = await _context.Casos.FirstOrDefaultAsync(c => c.idCaso == dto.idCaso);
+            if (caso == null)
+                throw new ArgumentException("El caso no existe.");
+
+            // Valida que exista el mecánico
+            var mecanico = await _context.Usuarios.FirstOrDefaultAsync(u => u.idUsuario == dto.idMecanico);
+            if (mecanico == null || mecanico.tipoUsuario != Usuarios.Tipousuario.Mecanico)
+                throw new ArgumentException("El mecánico no existe o no es válido.");
+
+            // Asigna al mecánico el caso
+            caso.idUsuario = dto.idMecanico;
+
+            await _context.SaveChangesAsync();
+            return caso;
+        }
     }
 }
