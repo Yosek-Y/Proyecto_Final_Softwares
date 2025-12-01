@@ -19,6 +19,8 @@ namespace Mecario_BackEnd.DBContexs
 
         public DbSet <OrdenesServicio> OrdenesServicios { get; set; }
 
+        public DbSet <ServiciosMecanicos> ServiciosMecanicos {get; set;}
+
         public DbSet <DetallesPiezas> DetallesPiezas { get; set; }
 
         public DbSet <DetallesCaso> DetallesCasos { get; set; }
@@ -93,6 +95,40 @@ namespace Mecario_BackEnd.DBContexs
                       .WithOne(c => c.ordenesServicio)
                       .HasForeignKey(c => c.idOrdenServicio)
                       .OnDelete(DeleteBehavior.Cascade);
+
+                // RELACIÓN MUCHOS A MUCHOS CON SERVICIOS
+                entity.HasMany(o => o.Servicios)
+                      .WithMany(s => s.OrdenesServicio)
+                      .UsingEntity<Dictionary<string, object>>(
+                            "OrdenServicio_Servicio",
+                            j => j
+                                  .HasOne<ServiciosMecanicos>()
+                                  .WithMany()
+                                  .HasForeignKey("idServicio")
+                                  .OnDelete(DeleteBehavior.Cascade),
+                            j => j
+                                  .HasOne<OrdenesServicio>()
+                                  .WithMany()
+                                  .HasForeignKey("idOrden")
+                                  .OnDelete(DeleteBehavior.Cascade),
+                            j =>
+                            {
+                                j.HasKey("idOrden", "idServicio");
+                                j.ToTable("OrdenServicio_Servicio"); // Nombre de la tabla puente
+                            }
+                      );
+            });
+
+            // ======================
+            // ||  TABLA SERVICIOS ||
+            // ======================
+            modelBuilder.Entity<ServiciosMecanicos>(entity =>
+            {
+                entity.HasKey(s => s.idServicio);
+                entity.Property(s => s.idServicio).ValueGeneratedOnAdd();
+                entity.Property(s => s.servicio).IsRequired(); //Que servicio es
+                entity.Property(s => s.tipoServicio).IsRequired().HasConversion<string>();        // Guarda enum como string
+                entity.Property(s => s.precio).IsRequired().HasColumnType("decimal(10,2)");
             });
 
             // ======================

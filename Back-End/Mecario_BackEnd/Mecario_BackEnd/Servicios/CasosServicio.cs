@@ -58,7 +58,6 @@ namespace Mecario_BackEnd.Servicios
                 .Where(c => c.idCaso == idCaso) // Ajusta si se llama distinto (ej: c.id)
                 .Select(c => new FacturaCasoDTO
                 {
-                    idCaso = c.idCaso,
                     totalCaso = c.totalCaso,
                     fechaInicio = c.fechaInicio,
                     fechaFin = c.fechaFin
@@ -68,63 +67,28 @@ namespace Mecario_BackEnd.Servicios
             return factura; // null si no existe
         }
 
-        // NUEVO: Listar todas las facturas de todos los casos
-        public async Task<List<TodasLasFacturasDTO>> ListarFacturasDeCasosAsync(int? idMecanico = null, CancellationToken ct = default)
+        // Método para listar todas las facturas de todos los casos
+        public async Task<List<TodasLasFacturasDTO>> ListarTodasLasFacturas()
         {
-            // Validar el mecánico si se envía idMecanico
-            if (idMecanico.HasValue)
-            {
-                if (idMecanico.Value <= 0)
-                    throw new ArgumentException("El id del mecánico debe ser mayor que cero.");
-
-                var usuario = await _context.Usuarios
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(u => u.idUsuario == idMecanico.Value, ct);
-
-                if (usuario is null)
-                    throw new KeyNotFoundException($"No existe el mecánico con id {idMecanico.Value}.");
-
-                // se verifica que debe ser Mecanico
-                if (usuario.tipoUsuario != Usuarios.Tipousuario.Mecanico)
-                    throw new ArgumentException($"El usuario con id {idMecanico.Value} no es un mecánico.");
-            }
-
-            var query =
+            // Trae todos los casos junto con los datos del mecánico
+            var lista = await (
                 from c in _context.Casos.AsNoTracking()
                 join u in _context.Usuarios.AsNoTracking()
                     on c.idUsuario equals u.idUsuario
-                select new
+                orderby c.idCaso
+                select new TodasLasFacturasDTO
                 {
-                    c.idCaso,
-                    c.fechaInicio,
-                    c.fechaFin,
-                    c.horasTrabajadas,
-                    c.totalCaso,
-                    idMecanico = u.idUsuario,
-                    mecanicoNombre = u.nombreUsuario 
-                };
+                    idCaso = c.idCaso,
+                    totalCaso = c.totalCaso,
+                    fechaInicio = c.fechaInicio,
+                    fechaFin = c.fechaFin,
+                    horasTrabajadas = c.horasTrabajadas,
+                    idUsuario = u.idUsuario,
+                    nombreMecanico = u.nombreUsuario ?? string.Empty
+                }
+            ).ToListAsync();
 
-            if (idMecanico.HasValue)
-            {
-                query = query.Where(x => x.idMecanico == idMecanico.Value);
-            }
-
-            var lista = await query
-                .OrderBy(x => x.idCaso)
-                .Select(x => new TodasLasFacturasDTO
-                {
-                    idCaso = x.idCaso,
-                    fechaInicio = x.fechaInicio,
-                    fechaFin = x.fechaFin,
-                    horasTrabajadas = x.horasTrabajadas,
-                    totalCaso = x.totalCaso,
-                    idUsuario = x.idMecanico,
-                    nombreMecanico = x.mecanicoNombre ?? string.Empty
-                })
-                .ToListAsync(ct);
-
-            // Nota: si el mecánico existe pero no tiene casos, se devuelve una lista vacía.
-            return lista;
+            return lista; // devuelve lista vacía si no hay casos
         }
 
 
@@ -173,7 +137,6 @@ namespace Mecario_BackEnd.Servicios
                 orderby c.idCaso
                 select new CasosSegunStatusDTO
                 {
-                    idCaso = c.idCaso,
                     fechaInicio = c.fechaInicio,
                     fechaFin = c.fechaFin,
                     horasTrabajadas = c.horasTrabajadas,
@@ -212,26 +175,6 @@ namespace Mecario_BackEnd.Servicios
             await _context.SaveChangesAsync();
 
             return "Caso asignado correctamente al mecánico.";
-        }
-
-        // Método para asignar un mecánico a un caso
-        public async Task<Casos> AsignarMecanico(MecanicoSeAsignaCasoDTO dto)
-        {
-            // Valida que exista el caso
-            var caso = await _context.Casos.FirstOrDefaultAsync(c => c.idCaso == dto.idCaso);
-            if (caso == null)
-                throw new ArgumentException("El caso no existe.");
-
-            // Valida que exista el mecánico
-            var mecanico = await _context.Usuarios.FirstOrDefaultAsync(u => u.idUsuario == dto.idMecanico);
-            if (mecanico == null || mecanico.tipoUsuario != Usuarios.Tipousuario.Mecanico)
-                throw new ArgumentException("El mecánico no existe o no es válido.");
-
-            // Asigna al mecánico el caso
-            caso.idUsuario = dto.idMecanico;
-
-            await _context.SaveChangesAsync();
-            return caso;
         }
     }
 }

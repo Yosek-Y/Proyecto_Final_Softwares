@@ -14,36 +14,42 @@ namespace Mecario_BackEnd.Servicios
         {
             _context = context;
         }
-        // Crear una nueva orden de servicio
-        public async Task<OrdenesServicio> CrearOrdenServicio(CrearOrdenServicioDTO dto)
+        public async Task<OrdenesServicio> CrearOrden(CrearOrdenServicioDTO dto)
         {
-            // VALIDACIONES
-            if (!Enum.IsDefined(typeof(OrdenesServicio.TipoServicio), dto.TipoServicio))
-                throw new ArgumentException("El tipo de servicio no es válido.");
+            // 1. Extraer los IDs que vienen como string
+            var idsString = dto.diagnosticoInicial.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            List<int> ids = idsString.Select(id => int.Parse(id.Trim())).ToList();
 
-            if (string.IsNullOrWhiteSpace(dto.diagnosticoInicial))
-                throw new ArgumentException("El diagnóstico es obligatorio.");
+            // 2. Buscar los servicios en la BD
+            var servicios = await _context.ServiciosMecanicos
+                .Where(s => ids.Contains(s.idServicio))
+                .ToListAsync();
 
-            if (dto.costoInicial < 0)
-                throw new ArgumentException("El costo inicial no puede ser negativo.");
+            if (servicios.Count == 0)
+                throw new Exception("Ninguno de los servicios existe.");
 
-            var vehiculo = await _context.Vehiculos.FindAsync(dto.idVehiculo);
-            if (vehiculo == null)
-                throw new ArgumentException("El vehículo especificado no existe.");
+            // 3. Sumar precios
+            double subtotal = servicios.Sum(s => s.precio);
 
-            // CREAR OBJETO
-            var nuevaOrden = new OrdenesServicio
+            // 4. Convertir los NOMBRES de los servicios a un string
+            string diagnosticoLegible = string.Join(", ", servicios.Select(s => s.servicio));
+
+            // 5. Crear la orden usando el string legible
+            var orden = new OrdenesServicio
             {
                 tipoServicio = (OrdenesServicio.TipoServicio)dto.TipoServicio,
-                diagnosticoInicial = dto.diagnosticoInicial,
-                costoInicial = dto.costoInicial,
-                idVehiculo = dto.idVehiculo
+                diagnosticoInicial = diagnosticoLegible, 
+                costoInicial = subtotal,
+                idVehiculo = dto.idVehiculo,
+                Servicios = servicios
             };
 
-            _context.OrdenesServicios.Add(nuevaOrden);
+            // 6. Guardar en BD
+            _context.OrdenesServicios.Add(orden);
             await _context.SaveChangesAsync();
 
-            return nuevaOrden;
+            return orden;
         }
+
     }
 }

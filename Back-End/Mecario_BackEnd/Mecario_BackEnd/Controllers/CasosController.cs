@@ -36,7 +36,26 @@ namespace Mecario_BackEnd.Controllers
             }
         }
 
-        //Obtener la "factura" (totalCaso) de un caso por su ID
+        // POST: Api/Casos/AsignarCaso
+        [HttpPost("AsignarCaso")]
+        public async Task<IActionResult> AsignarCasoPorAdmin([FromBody] AsignarCasoAdminDTO dto)
+        {
+            try
+            {
+                var resultado = await _service.AsignarCasoPorAdmin(dto);
+                return Ok(new { mensaje = resultado });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Error interno del servidor", detalle = ex.Message });
+            }
+        }
+
+        //Peticion para obetener la factura de un caso en especifico
         [HttpGet("FacturaIndividual")]
         [ProducesResponseType(typeof(FacturaCasoDTO), 200)]
         [ProducesResponseType(400)]
@@ -64,22 +83,28 @@ namespace Mecario_BackEnd.Controllers
             }
         }
 
-        //Obtener la lista de facturas (totalCaso) de todos los casos, opcionalmente filtrando por idMecanico
-        [HttpGet("Facturas")]
-        [ProducesResponseType(typeof(List<TodasLasFacturasDTO>), 200)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> ListarFacturasDeCasos([FromQuery] int? idMecanico, CancellationToken ct = default)
+        // Protocolo HTTP Get para obtener todas las facturas de todos los casos
+        // GET: Api/Casos/ListarTodasLasFacturas
+        [HttpGet("ListarTodasLasFacturas")]
+        public async Task<IActionResult> ListarTodasLasFacturas()
         {
             try
             {
-                var lista = await _service.ListarFacturasDeCasosAsync(idMecanico, ct);
-                return Ok(lista);
+                var lista = await _service.ListarTodasLasFacturas();
+                return Ok(new
+                {
+                    mensaje = "Lista de facturas obtenida correctamente",
+                    data = lista
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { error = "Error interno del servidor", detalle = ex.Message });
+                return StatusCode(500, new
+                {
+                    error = "Error interno del servidor",
+                    detalle = ex.Message
+                });
             }
-
         }
 
         //Obtener la lista de casos filtrando por su estado (status)

@@ -2,7 +2,6 @@
 {
     public class CasosSegunStatusDTO
     {
-        public int idCaso { get; set; }
         public DateTime fechaInicio { get; set; }
         public DateTime? fechaFin { get; set; }
         public double horasTrabajadas { get; set; }

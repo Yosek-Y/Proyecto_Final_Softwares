@@ -19,32 +19,16 @@ namespace Mecario_BackEnd.Controllers
         // Protocolo HTTP Post para crear una nueva orden de servicio
         // POST: Api/OrdenesServicio/NuevaOrden
         [HttpPost("NuevaOrden")]
-        public async Task<IActionResult> CrearOrden([FromBody] CrearOrdenServicioDTO dto)
+        public async Task<IActionResult> Crear([FromBody] CrearOrdenServicioDTO dto)
         {
             try
             {
-                var orden = await _service.CrearOrdenServicio(dto);
-
-                return Ok(new
-                {
-                    mensaje = "Orden de servicio creada correctamente",
-                    data = new
-                    {
-                        orden.idOrden,
-                        orden.tipoServicio,
-                        orden.diagnosticoInicial,
-                        orden.costoInicial,
-                        orden.idVehiculo
-                    }
-                });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { error = ex.Message });
+                var orden = await _service.CrearOrden(dto);
+                return Ok(orden);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { error = "Error interno del servidor", detalle = ex.Message });
+                return BadRequest(new { mensaje = ex.Message });
             }
         }
     }
