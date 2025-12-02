@@ -16,6 +16,71 @@ namespace Mecario_BackEnd.Controllers
             _service = service;
         }
 
+        //Protocolo HTTP Post para crear caso
+        // POST: Api/Casos/CrearCaso
+        [HttpPost("CrearCaso")]
+        public async Task<IActionResult> CrearCaso([FromBody] CrearCasoDTO dto)
+        {
+            try
+            {
+                var caso = await _service.CrearCasoAsync(dto);
+                return Ok(caso);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
+        }
+
+        //Protocolo HTTP Put para abrir un caso
+        // POST: Api/Casos/AbrirCaso
+        [HttpPut("AbrirCaso")]
+        public async Task<IActionResult> AbrirCaso([FromBody] AbrirCasoDTO dto)
+        {
+            try
+            {
+                var caso = await _service.AbrirCasoAsync(dto);
+                return Ok(caso);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
+        }
+
+        //Protocolo HTTP Put para continuar
+        // PUT: Api/Casos/ContinuarCaso
+        [HttpPut("ContinuarCaso")]
+        public async Task<IActionResult> ContinuarCaso([FromBody] ContinuarCasoDTO dto)
+        {
+            try
+            {
+                var caso = await _service.ContinuarCasoAsync(dto);
+                return Ok(caso);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
+        }
+
+        //Protocolo HTTP Put para continuar
+        // PUT: Api/Casos/CerrarCaso
+        [HttpPut("CerrarCaso")]
+        public async Task<IActionResult> CerrarCaso([FromBody] CerrarCasoDTO dto)
+        {
+            try
+            {
+                var resultado = await _service.CerrarCasoAsync(dto);
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
+        }
+
+
         //Protocolo HTTP Get para obtener todos los casos donde participo dicho mecanico
         //POST: api/Mecanico/{idMecanico:int}
         [HttpGet("Mecanico/Casos_{idMecanico:int}")]
@@ -36,6 +101,7 @@ namespace Mecario_BackEnd.Controllers
             }
         }
 
+        //Protocolo HTTP Post para asignar caso
         // POST: Api/Casos/AsignarCaso
         [HttpPost("AsignarCaso")]
         public async Task<IActionResult> AsignarCasoPorAdmin([FromBody] AsignarCasoAdminDTO dto)
@@ -56,6 +122,7 @@ namespace Mecario_BackEnd.Controllers
         }
 
         //Peticion para obetener la factura de un caso en especifico
+        //GET: Api/Casos/FacturaIndividual
         [HttpGet("FacturaIndividual")]
         [ProducesResponseType(typeof(FacturaCasoDTO), 200)]
         [ProducesResponseType(400)]
@@ -108,6 +175,7 @@ namespace Mecario_BackEnd.Controllers
         }
 
         //Obtener la lista de casos filtrando por su estado (status)
+        //GET: Api/Casos/CasosPorStatus
         [HttpGet("CasosPorStatus")]
         [ProducesResponseType(typeof(List<CasosSegunStatusDTO>), 200)]
         [ProducesResponseType(400)]

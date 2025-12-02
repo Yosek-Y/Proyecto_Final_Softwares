@@ -15,6 +15,30 @@ namespace Mecario_BackEnd.Servicios
             _context = context;
         }
 
+        //Metodo para crear un caso
+        public async Task<Casos> CrearCasoAsync(CrearCasoDTO dto)
+        {
+            // Validar que la orden exista
+            var orden = await _context.OrdenesServicios.FirstOrDefaultAsync(o => o.idOrden == dto.idOrdenServicio);
+            if (orden == null)
+                throw new Exception("La orden de servicio no existe.");
+
+            var caso = new Casos
+            {
+                idOrdenServicio = dto.idOrdenServicio,
+                idUsuario = dto.idUsuario ?? 0,       // 0 si no hay usuario asignado
+                fechaInicio = DateTime.MinValue,      // Inicial
+                fechaFin = null,                       // Sin terminar
+                horasTrabajadas = 0,
+                estadoCaso = Casos.EstadoCaso.noEmpezado,
+                totalCaso = 0
+            };
+
+            _context.Casos.Add(caso);
+            await _context.SaveChangesAsync();
+            return caso;
+        }
+
         //Metodo para que se listen los casos de un mecanico
         public async Task<List<CasosDeMecanicoDTO>> ListarCasosPorMecanico(int idMecanico)
         {
@@ -44,6 +68,60 @@ namespace Mecario_BackEnd.Servicios
             }).ToList();
 
             return lista;
+        }
+
+        //Metodo para abrir un caso
+        public async Task<Casos> AbrirCasoAsync(AbrirCasoDTO dto)
+        {
+            var caso = await _context.Casos.FirstOrDefaultAsync(c => c.idCaso == dto.idCaso);
+            if (caso == null)
+                throw new Exception("El caso especificado no existe.");
+
+            caso.fechaInicio = dto.fechaInicio;
+            caso.estadoCaso = Casos.EstadoCaso.enProceso;
+
+            _context.Casos.Update(caso);
+            await _context.SaveChangesAsync();
+
+            return caso;
+        }
+
+        //Metodo para cuando un caso se continuara despues
+        public async Task<Casos> ContinuarCasoAsync(ContinuarCasoDTO dto)
+        {
+            var caso = await _context.Casos.FirstOrDefaultAsync(c => c.idCaso == dto.idCaso);
+            if (caso == null)
+                throw new Exception("El caso especificado no existe.");
+
+            // Sumamos las horas recibidas a las existentes
+            caso.horasTrabajadas += dto.horasTrabajadas;
+
+            _context.Casos.Update(caso);
+            await _context.SaveChangesAsync();
+
+            return caso;
+        }
+
+        //Metodo para terminar un caso 
+        public async Task<Casos> CerrarCasoAsync(CerrarCasoDTO dto)
+        {
+            var caso = await _context.Casos.FirstOrDefaultAsync(c => c.idCaso == dto.idCaso);
+            if (caso == null)
+                throw new Exception("El caso especificado no existe.");
+
+            // Sumar horas trabajadas
+            caso.horasTrabajadas += dto.horasTrabajadas;
+
+            // Colocar fecha de finalización
+            caso.fechaFin = dto.fechaFin;
+
+            // Cambiar estado a terminado
+            caso.estadoCaso = Casos.EstadoCaso.terminado;
+
+            _context.Casos.Update(caso);
+            await _context.SaveChangesAsync();
+
+            return caso;
         }
 
         // NUEVO: Obtener factura (totalCaso) de un caso por su ID
@@ -93,7 +171,7 @@ namespace Mecario_BackEnd.Servicios
 
 
         // Listar casos por estado (status)
-        public async Task<List<CasosSegunStatusDTO>> ListarCasosPorStatusAsync(string status, CancellationToken ct = default)
+        public async Task<List<CasosSegunStatusDTO>> ListarCasosPorStatusAsync (string status, CancellationToken ct = default)
         {
             if (string.IsNullOrWhiteSpace(status))
                 throw new ArgumentException("El parámetro 'status' es obligatorio.");

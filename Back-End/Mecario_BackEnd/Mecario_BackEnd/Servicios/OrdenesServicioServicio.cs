@@ -2,7 +2,6 @@
 using Mecario_BackEnd.Modelos;
 using Mecario_BackEnd.Modelos.DTOs;
 using Microsoft.EntityFrameworkCore;
-using System.Net.Mail;
 
 namespace Mecario_BackEnd.Servicios
 {

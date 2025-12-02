@@ -12,6 +12,8 @@ builder.Services.AddScoped<UsuariosServicio>();
 builder.Services.AddScoped<CasosServicio>();
 builder.Services.AddScoped<ClientesServicio>();
 builder.Services.AddScoped<VehiculosServicio>();
+builder.Services.AddScoped<DetallesPiezaServicio>();
+builder.Services.AddScoped<DetallesCasoServicio>();
 builder.Services.AddScoped<OrdenesServicioServicio>();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

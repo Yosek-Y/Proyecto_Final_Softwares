@@ -10,7 +10,6 @@ namespace Mecario_BackEnd.DBContexs
         {
         
         }
-
         public DbSet <Usuarios> Usuarios { get; set; }
 
         public DbSet <Vehiculos> Vehiculos { get; set; }
@@ -119,14 +118,14 @@ namespace Mecario_BackEnd.DBContexs
                       );
             });
 
-            // ======================
-            // ||  TABLA SERVICIOS ||
-            // ======================
+            // ================================
+            // ||  TABLA SERVICIOS MECANICOS ||
+            // ================================
             modelBuilder.Entity<ServiciosMecanicos>(entity =>
             {
                 entity.HasKey(s => s.idServicio);
                 entity.Property(s => s.idServicio).ValueGeneratedOnAdd();
-                entity.Property(s => s.servicio).IsRequired(); //Que servicio es
+                entity.Property(s => s.servicio).IsRequired();                                    //Que servicio es
                 entity.Property(s => s.tipoServicio).IsRequired().HasConversion<string>();        // Guarda enum como string
                 entity.Property(s => s.precio).IsRequired().HasColumnType("decimal(10,2)");
             });
@@ -197,7 +196,7 @@ namespace Mecario_BackEnd.DBContexs
                 entity.Property(e => e.idDetalleCaso).ValueGeneratedOnAdd();
                 //CAMPOS OBLIGATORIOS (NOT NULL)
                 entity.Property(e => e.tareaRealizada).IsRequired();            //Tarea que se realizo en el caso
-                entity.Property(e => e.hora).IsRequired();                      //Hora en la que se termino una de las tareas del caso
+                entity.Property(e => e.hora).IsRequired();                      //Hora en la que se termino una de las tareas del 
             });
 
             // ====================
